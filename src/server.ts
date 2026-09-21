@@ -3,7 +3,6 @@ import { createMcpHandler } from "agents/mcp/server";
 import { z } from "zod";
 
 const createCartInputSchema = z.object({
-  const addCartInputSchema = z.object({
   shop_domain: z
     .string()
     .describe("The shop domain to call. This maps to https://{shop-domain}/api/ucp/mcp."),
