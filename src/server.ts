@@ -2,7 +2,7 @@ import { McpServer } from "@modelcontextprotocol/server";
 import { createMcpHandler } from "agents/mcp/server";
 import { z } from "zod";
 
-const createCartInputSchema = z.object({
+const addCartInputSchema = z.object({
   shop_domain: z
     .string()
     .describe("The shop domain to call. This maps to https://{shop-domain}/api/ucp/mcp."),
@@ -171,103 +171,6 @@ const updateCartInputSchema = z.object({
       "The cart object containing the full desired cart state. Any field you omit is removed from the cart. update_cart uses PUT semantics and does not merge partial updates."
     )
     .optional()
-});
-
-const cancelCartInputSchema = z.object({
-  shop_domain: z
-    .string()
-    .describe("The shop domain to call. This maps to https://{shop-domain}/api/ucp/mcp."),
-  meta: z
-    .object({
-      "ucp-agent": z.object({
-        profile: z
-          .string()
-          .url()
-          .describe("The URI to your agent's UCP profile for capability negotiation.")
-      }),
-      "idempotency-key": z
-        .string()
-        .uuid()
-        .describe("A UUID required for retry safety.")
-    })
-    .describe("Request metadata. You must include ucp-agent.profile and idempotency-key."),
-  id: z.string().describe("The ID of the cart to cancel.")
-});
-
-const updateCartInputSchema = z.object({
-  shop_domain: z
-    .string()
-    .describe("The shop domain to call. This maps to https://{shop-domain}/api/ucp/mcp."),
-  meta: z
-    .object({
-      "ucp-agent": z.object({
-        profile: z
-          .string()
-          .url()
-          .describe("The URI to your agent's UCP profile for capability negotiation.")
-      })
-    })
-    .describe("Request metadata. You must include ucp-agent.profile."),
-  id: z.string().describe("The ID of the cart to update."),
-  cart: z
-    .object({
-      line_items: z
-        .array(
-          z.object({
-            quantity: z
-              .number()
-              .int()
-              .min(1)
-              .describe("The full replacement quantity for this line item."),
-            item: z.object({
-              id: z
-                .string()
-                .describe("The product variant id for this line item.")
-            })
-          })
-        )
-        .describe("Full replacement array of items."),
-      context: z
-        .object({
-          address_country: z.string().optional().describe("Localization signal for the buyer country."),
-          address_region: z.string().optional().describe("Localization signal for the buyer region."),
-          postal_code: z.string().optional().describe("Localization signal for the buyer postal code.")
-        })
-        .describe(
-          "Localization signals. Context is a hint for pricing, availability, and currency and is not used as the shipping address at checkout."
-        )
-        .optional(),
-      attribution: z
-        .object({
-          referring_domain: z.string().optional(),
-          click_id_tag: z.string().optional(),
-          click_id_value: z.string().optional(),
-          activity_id_tag: z.string().optional(),
-          activity_id_value: z.string().optional(),
-          utm_campaign: z.string().optional(),
-          utm_source: z.string().optional(),
-          utm_medium: z.string().optional(),
-          utm_content: z.string().optional(),
-          utm_term: z.string().optional()
-        })
-        .describe(
-          "Attribution metadata. Because the cart object is replaced, resend attribution if you want to preserve it."
-        )
-        .optional(),
-      buyer: z
-        .object({})
-        .passthrough()
-        .describe("Optional buyer information.")
-        .optional(),
-      signals: z
-        .object({})
-        .passthrough()
-        .describe("Optional platform signals.")
-        .optional()
-    })
-    .describe(
-      "The cart object containing the full desired cart state. Any field you omit is removed from the cart. update_cart uses PUT semantics and does not merge partial updates."
-    )
 });
 
 const cancelCartInputSchema = z.object({
